@@ -153,21 +153,23 @@ function create() {
     //     });
     // });
 
-    /// TODO impl
-    this.socket.on('serverBulletMoved', 
-        function(bulletInfo){
-            // update all players on client
-            self.bullets.getChildren()
-                        .forEach(
-                            function(b){
-                                if(bulletInfo.bulletId === b.bulletId){
-                                    // otherPlayer.setRotation(bulletInfo.rotation);
-                                    b.setPosition(bulletInfo.x, playerInfo.y);
-                                }
-                            }
-                        );
-        }
-    );
+    this.socket.on('serverBulletsUpdated', function(bulletsData){
+        var {bulletIds, xs, ys} = bulletsData;
+        bulletIds.forEach((bulletId, i) => {
+            /// TODO store map id->bullet for fast access
+            /// otherwise this is a useless search
+            self.bullets.getChildren().forEach(b => {
+                if(bulletId === b.id){
+                    // otherPlayer.setRotation(bulletInfo.rotation);
+                    b.setPosition(xs[i], ys[i]);
+                }
+            });
+        });        
+    });
+
+    this.socket.on('serverBulletSpawned', function(bulletSpawnInfo){
+        clientAddBullet(self, bulletSpawnInfo);
+    });
 
     this.socket.on('serverPlayerUpdated', function(playersData) {
         // console.log(`${self.socket.id}: players updated`);
@@ -468,9 +470,24 @@ function clientAddPlayer(self, playerInfo, sprite){
         player.setTint(0x0000ff);
     else 
         player.setTint(0xff0000);
+    // add this new player to the client's list of players
+    self.players.add(player);
     // assign it the player id (coming from playerInfo
     // from server's event)
     player.playerId = playerInfo.playerId;
-    // add this new player to the client's list of players
-    self.players.add(player);
+}
+
+function clientAddBullet(self, bulletSpawnInfo) {
+    const bullet = self.add.sprite(
+        bulletSpawnInfo.x,
+        bulletSpawnInfo.y,
+        'bullet') /// TODO hardcoded
+        .setOrigin(0.5,0.5)
+        .setDisplaySize(15,15)
+        .setTint(0xdd5510);
+    self.bullets.add(bullet);
+    bullet.id = bulletSpawnInfo.bulletId;
+    // console.log("client: added bullet");
+    // console.log(bullet);
+    // console.log(bullet.id);
 }

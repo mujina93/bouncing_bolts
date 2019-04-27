@@ -32,9 +32,6 @@ function preload() {}
 // players info object: store data about the players
 const playersData = {}; /// TODO change players to playersInfo, or self.players to self.playersGameObjects
 
-// all projectiles flying around
-var bullets = [];
-
 function create() {
   // this.physics.world.setBoundsCollision();
   // console.log(this);
@@ -165,7 +162,7 @@ function create() {
         bulletData.y - player.y)
         .normalize();
 
-      const OFFSET_CASTER_BULLET = 20; /// TODO move globally
+      const OFFSET_CASTER_BULLET = 30; /// TODO move globally
       var position_pl = new Phaser.Math.Vector2(player.x, player.y);
       var position_bullet = position_pl.add(direction.clone().scale(OFFSET_CASTER_BULLET));
       var bullet = self.add.image(position_bullet.x,
@@ -178,7 +175,7 @@ function create() {
       /// NOTE! set bullet properties only AFTER you have added the bullet to the group
       // otherwise phaser wipes off the data!
       bullet.body.setCollideWorldBounds(true);
-      bullet.body.setBounce(1,1);
+      bullet.body.setBounce(0.7,0.7);
       
       const MAX_BULLET_SPEED = 300; /// TODO move global
       bullet.body.setVelocity(
@@ -194,6 +191,13 @@ function create() {
         self.playersGO, 
         self.bullets, 
         callbackBulletOnPlayer);
+      
+      io.emit('serverBulletSpawned',{
+        bulletId: bullet.id,
+        x: bullet.x,
+        y: bullet.y
+      });
+      
     });
 
     /// TODO remove
@@ -328,7 +332,7 @@ function randomPosition(max, margin=50){
 function update() {
 
   this.playersGO.getChildren().forEach(updatePlayer);
-  
+  broadcastBulletsUpdate(this); /// TODO optimize by just sending when there are bullets
 }
 // var i = 0; // TODO remove debug
 function updatePlayer(player){
@@ -386,6 +390,32 @@ function updatePlayer(player){
   // console.log(playersData[player.playerId].x);
   // console.log(playersData[player.playerId].y);
   io.emit('serverPlayerUpdated', playersData);
+}
+
+function broadcastBulletsUpdate(self){
+  // bullets gets updated automatically since
+  // it has initial velocity and max bounce
+
+  
+  var bulletIds = new Array();
+  var  xs =  new Array();
+  var  ys = new Array();
+  self.bullets.getChildren().forEach(function(bullet,i ){
+    // console.log("EEEEEEEEEEEEEEEEEEE");
+    // console.log(typeof(bulletsData.bulletIds));
+    // console.log(bulletsData.bulletIds.prototype);
+    bulletIds.push(bullet.id);
+    xs.push(bullet.x);
+    ys.push(bullet.y);
+  });
+
+  // SOA to send
+  var bulletsData = {
+      bulletIds,
+      xs,
+      ys
+  };
+  io.emit('serverBulletsUpdated', bulletsData);
 }
 
 function serverAddPlayer(self, playerInfo){

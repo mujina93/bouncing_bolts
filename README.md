@@ -1,3 +1,10 @@
+# TODO
+
+[ ] finish implementing bullets system multiplayer
+[ ] remove scratch.js from github
+[ ] phaser and socket as local or CDN? check [link](https://stackoverflow.com/questions/27464168/how-to-include-scripts-located-inside-the-node-modules-folder)
+
+
 # Resources
 
 [authoritative game instance](https://phasertutorials.com/creating-a-simple-multiplayer-game-in-phaser-3-with-an-authoritative-server-part-1/)

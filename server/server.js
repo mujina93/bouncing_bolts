@@ -129,15 +129,25 @@ var io = require('socket.io').listen(server);
 //     })
 // });
 
+/// TODO start from here to make phaser and socket available locally instead of
+/// from CDN. Check https://stackoverflow.com/questions/27464168/how-to-include-scripts-located-inside-the-node-modules-folder
+// app.get('/phaser.min.js', function(req, res) {
+//     res.sendFile(__dirname + '/../node_modules/phaser/dist/phaser.min.js');
+// });
+// app.get('/socket.io/socket.io.js', function(req, res) {
+//     res.sendFile(__dirname + '/../node_modules/socket.io-client/dist/socket.io.js');
+// });
+
+
 // update the server to rendere static files using
 // the express.static middleware function
 app.use(express.static(__dirname + '/../public'));
+
 
 // serve the index.html as the root page ('/')
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/../index.html');
 });
-
 // // make the server listen on port 8081
 // server.listen(8081, function(){
 //     console.log(`Listening on ${server.address().port}`);
