@@ -175,7 +175,7 @@ function create() {
       /// NOTE! set bullet properties only AFTER you have added the bullet to the group
       // otherwise phaser wipes off the data!
       bullet.body.setCollideWorldBounds(true);
-      bullet.body.setBounce(0.7,0.7);
+      bullet.body.setBounce(0.9,0.9);
       
       const MAX_BULLET_SPEED = 300; /// TODO move global
       bullet.body.setVelocity(
