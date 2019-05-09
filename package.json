@@ -4,7 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel server/server.js --target node",
+    "buildBabelOnly": "babel server/server.js -d dist",
+    "devBuild": "parcel build server/server.js --target node -d dist/server --public-url ./ --no-minify --no-cache",
+    "devStart": "npm run devBuild && node dist/server/server.js",
+    "build": "parcel build server/server.js --target node -d dist/server --public-url /dist",
+    "start": "npm run build && node dist/server/server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +22,12 @@
     "jsdom": "^15.0.0",
     "phaser": "^3.10.1",
     "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "parcel-bundler": "^1.12.3"
   }
 }

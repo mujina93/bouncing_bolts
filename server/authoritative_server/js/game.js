@@ -1,3 +1,5 @@
+import {findClientsPlayer} from '../../../common/js/utils';
+
 const config = {
     type: Phaser.HEADLESS,
     parent: 'phaser-example', //if this element does not exist, phaser will create a canvas for it
@@ -190,7 +192,9 @@ function create() {
       self.physics.add.overlap(
         self.playersGO, 
         self.bullets, 
-        callbackBulletOnPlayer);
+        callbackBulletOnPlayer,
+        null,
+        self);
       
       io.emit('serverBulletSpawned',{
         bulletId: bullet.id,
@@ -267,62 +271,62 @@ function create() {
 
 function callbackBulletOnPlayer(player, bullet){
   console.log("server: player touched bullet!");
-  // console.log(player.playerId);
-  // console.log(playersData[player.playerId]);
-  // console.log(playersData[player.playerId].team);
-  // if (playersData[player.playerId].team === 'red'){
-  //   self.scores.red += 10;
-  // } else {
-  //   self.scores.blue += 10;
-  // }
-
-  // self.star.setPosition(
-  //   randomPosition(600),
-  //   randomPosition(600)
-  // );
-
-  // io.emit('serverScoreUpdated', self.scores);
-  // io.emit('serverStarRespawned',{
-  //   x: self.star.x,
-  //   y: self.star.y
-  // });
+  bullet.destroy();
+  const collisionData = {
+    playerId: player.playerId,
+    bulletId: bullet.id
+  };
+  io.emit('serverBulletOnPlayer', collisionData);
 }
 
-function findClientsPlayer(playersGO, socketId) {
-  var targetPlayer = null;
-  playersGO.getChildren().some(function (player) {
-    console.log(player.playerId)
-    console.log(socketId);
+// /// TODO refactor using findInGroupGivenId(phaserGroup, id,
+// /// or use just that function
+// function findClientsPlayer(playersGO, socketId) {
+//   var targetPlayer = null;
+//   playersGO.getChildren().some(function (player) {
+//     console.log(player.playerId)
+//     console.log(socketId);
+//     // console.log("TYPES: " + typeof(player.playerId) + " " + typeof(socketId));
+//     console.log("SAME? ");
+//     console.log(player.playerId === socketId);
+//     // console.log(player.playerId.length + ' ' + socketId.length);
+//     if (player.playerId === socketId) {
+//       targetPlayer = player;
+//       return true; // returning true to some() breaks the loop
+//     }
+//   });
+//   if (targetPlayer === null){
+//     console.log(`PROBLEM! player not found with id: ${socketId}`);
+//   }
+//   // playersGO.getChildren().forEach(function (player) {
+//   //   console.log(player.playerId);
+//   // });
+//   return targetPlayer;
+// }
+
+/// TODO refactor and rename playerId in playersGO to simply id,
+/// then use this function in place of specific ones for finding players and bullets
+function findInGroupGivenId(phaserGroup, id, idPropertyName='id'){
+  var target = null;
+  phaserGroup.getChildren().some(function (member) {
+    // console.log(player.playerId)
+    // console.log(socketId);
     // console.log("TYPES: " + typeof(player.playerId) + " " + typeof(socketId));
-    console.log("SAME? ");
-    console.log(player.playerId === socketId);
+    // console.log("SAME? ");
+    // console.log(player.playerId === socketId);
     // console.log(player.playerId.length + ' ' + socketId.length);
-    if (player.playerId === socketId) {
-      targetPlayer = player;
+    if (member[idPropertyName] === id) {
+      target = member;
       return true; // returning true to some() breaks the loop
     }
   });
-  if (targetPlayer === null){
-    console.log(`PROBLEM! player not found with id: ${socketId}`);
+  if (target === null){
+    console.log(`PROBLEM! member not found with id: ${id}`);
   }
   // playersGO.getChildren().forEach(function (player) {
   //   console.log(player.playerId);
   // });
-  return targetPlayer;
-}
-
-/// TODO FIX THIS WON'T WORK IF YOU USE IT
-/// consider findClientsPlayer
-/// TODO refactor and rename playerId in playersGO to simply id,
-/// then use this function in place of specific ones for finding players and bullets
-function findInGroupGivenId(phaserGroup, id){
-  Object.keys(phaserGroup).forEach(function (member) {
-    if (member.id === id) {
-      return member;
-    }
-  });
-  console.log(`PROBLEM! member not found with id: ${id}`);
-  return null;
+  return target;
 }
 
 function randomPosition(max, margin=50){

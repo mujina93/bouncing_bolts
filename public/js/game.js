@@ -186,6 +186,21 @@ function create() {
         });
     });
 
+    this.socket.on('serverBulletOnPlayer', function(collisionData){
+        // var {playerId, bulletId} = collisionData;
+        // var player = findClientsPlayer(self.playersGO, playerId);
+        // self.bullets // CONTINUE
+        // var explosionSprite = this.add.sprite(
+        //     player.x, player.y, 'explosion')
+        //     .setScale(1);
+        //     // explosion.anims.load('burst'); // useful ?
+        //     explosionSprite.anims.play('burst');
+        
+        // this.add.image(32, 32, 'explosion', '__BASE').setOrigin(0); //  Show the whole animation sheet
+        // progress = this.add.text(100, 500, 'Progress: 0%', { color: '#00ff00' });
+        // this.input.keyboard.on('keydown_SPACE', function (event) {sprite.anims.play('walk');});
+    });
+
     // cursors
     // this.cursors = this.input.keyboard.createCursorKeys();
     // spacebar to be polled
